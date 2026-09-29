@@ -18,6 +18,12 @@ test('parsePrice handles currency formats', () => {
   assert.deepStrictEqual(parsePrice('Rs.13.51/-'), { price: 'Rs.13.51', priceValue: 13.51, currency: 'INR' });
   assert.strictEqual(parsePrice('₹ 1,23,456.00').priceValue, 123456);
   assert.strictEqual(parsePrice('Rs 16/-').currency, 'INR');
+  // Prices of 1000+ written without a thousands separator (Robu: "₹ 1209") must not be cut short.
+  assert.strictEqual(parsePrice('₹ 1209').priceValue, 1209);
+  assert.strictEqual(parsePrice('₹1209.00 (Incl. GST)').priceValue, 1209);
+  assert.strictEqual(parsePrice('Rs. 12345.50').priceValue, 12345.5);
+  assert.strictEqual(parsePrice('$1234').priceValue, 1234);
+  assert.strictEqual(parsePrice('₹1,209').priceValue, 1209);
   assert.strictEqual(parsePrice('USD 3.2').priceValue, 3.2);
   assert.strictEqual(parsePrice('€0.45 each').priceValue, 0.45);
   assert.strictEqual(parsePrice('call for price').priceValue, null);

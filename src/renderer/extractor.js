@@ -6,7 +6,7 @@
 // 2. Otherwise: find price elements and climb to the smallest "card" around each.
 // Sidebars, menus, carts and "related products" blocks are ignored.
 function extractListings() {
-  const PRICE_RE = /(?:[$€£¥₹]|\bRs\.?|\bINR|USD|EUR|GBP|CAD|AUD)\s*\d{1,3}(?:,\d{2,3})*(?:\.\d+)?|\d[\d,]*(?:\.\d+)?\s?(?:INR|USD|EUR|GBP|€)/i;
+  const PRICE_RE = /(?:[$€£¥₹]|\bRs\.?|\bINR|USD|EUR|GBP|CAD|AUD)\s*(?:\d{1,3}(?:,\d{2,3})+|\d+)(?:\.\d+)?|\d[\d,]*(?:\.\d+)?\s?(?:INR|USD|EUR|GBP|€)/i;
   const CARD_SEL = 'li.product, .type-product, .product-item, .product-thumb, .product-card, .product-grid-item, .product-miniature, ' +
     '.productitem, .grid-product, .card-wrapper, article.card, .product-layout, .product-block, .product-box, [data-product-id]';
   const EXCLUDE_ALWAYS = 'header, footer, nav, [role="navigation"], [role="banner"], [role="contentinfo"], ' +
@@ -135,7 +135,7 @@ function extractGoogleWeb() {
     !!document.querySelector('#captcha-form, form[action*="sorry"], iframe[src*="recaptcha"]');
   if (blocked) return { blocked: true, items: [], hasNext: false };
 
-  const PRICE_RE = /(?:[$€£¥₹]|\bRs\.?|\bINR|USD|EUR|GBP|CAD|AUD)\s*\d{1,3}(?:,\d{2,3})*(?:\.\d+)?|\d[\d,]*(?:\.\d+)?\s?(?:INR|USD|EUR|GBP|€)/i;
+  const PRICE_RE = /(?:[$€£¥₹]|\bRs\.?|\bINR|USD|EUR|GBP|CAD|AUD)\s*(?:\d{1,3}(?:,\d{2,3})+|\d+)(?:\.\d+)?|\d[\d,]*(?:\.\d+)?\s?(?:INR|USD|EUR|GBP|€)/i;
   const unwrap = (href) => {
     try {
       const u = new URL(href, document.baseURI);
@@ -195,7 +195,7 @@ function extractGoogleWeb() {
 // Reads price / stock / part number from any product page. Structured data first
 // (JSON-LD, meta tags, microdata), then visible-text heuristics.
 function extractProductInfo() {
-  const PRICE_RE = /(?:[$€£¥₹]|\bRs\.?|\bINR|USD|EUR|GBP|CAD|AUD)\s*\d{1,3}(?:,\d{2,3})*(?:\.\d+)?|\d[\d,]*(?:\.\d+)?\s?(?:INR|USD|EUR|GBP|€)/i;
+  const PRICE_RE = /(?:[$€£¥₹]|\bRs\.?|\bINR|USD|EUR|GBP|CAD|AUD)\s*(?:\d{1,3}(?:,\d{2,3})+|\d+)(?:\.\d+)?|\d[\d,]*(?:\.\d+)?\s?(?:INR|USD|EUR|GBP|€)/i;
   const toNum = (v) => {
     const m = String(v ?? '').match(/\d[\d,]*(?:\.\d+)?/); // "Rs.13.51/-" -> 13.51, "1,23,456" -> 123456
     const n = m ? parseFloat(m[0].replace(/,/g, '')) : NaN;

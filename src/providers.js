@@ -1,7 +1,7 @@
 // API search providers. Each returns { items: Listing[], hasMore: boolean }.
 // Listing = { title, link, source, price, priceValue, currency, thumbnail, snippet, rating, delivery, availability }
 
-const PRICE_RE = /([$€£¥₹]|\bRs\.?|\bINR|USD|EUR|GBP|CAD|AUD)\s*(\d{1,3}(?:,\d{2,3})*(?:\.\d+)?|\d+(?:\.\d+)?)/i;
+const PRICE_RE = /([$€£¥₹]|\bRs\.?|\bINR|USD|EUR|GBP|CAD|AUD)\s*((?:\d{1,3}(?:,\d{2,3})+|\d+)(?:\.\d+)?)/i;
 
 // "₹", "Rs.", "INR 12" -> "INR"; "$" -> "USD" … ; null when unknown.
 function currencyCode(text) {
