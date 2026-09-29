@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src * data:; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <title>Components Finder</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">⚡ Components Finder</div>
+    <form id="searchForm" class="search">
+      <input id="query" type="search" placeholder="Search components… e.g. STM32F103C8T6, 10k 0603 resistor, LM7805" autocomplete="off" autofocus />
+      <button type="submit" class="primary">Search</button>
+    </form>
+    <span id="providerBadge" class="badge"></span>
+    <button id="settingsBtn" title="Settings">⚙</button>
+  </header>
+
+  <main class="layout">
+    <!-- Results list -->
+    <section class="results-pane">
+      <div class="tabs" role="tablist">
+        <button id="tabResults" class="tab active" role="tab">Results</button>
+        <button id="tabCart" class="tab" role="tab">🛒 Cart <span id="cartCount" class="count"></span></button>
+      </div>
+      <div id="resultsView" class="view">
+      <div class="toolbar">
+        <input id="filter" type="search" placeholder="Filter results…" />
+        <select id="sort" title="Sort results">
+          <option value="trusted-price">Trusted first, cheapest</option>
+          <option value="price-asc">Cheapest first</option>
+          <option value="price-desc">Most expensive first</option>
+          <option value="relevance">Relevance</option>
+          <option value="source">Seller</option>
+          <option value="stock">Stock</option>
+        </select>
+        <button id="exportBtn" title="Export CSV" disabled>⭳ CSV</button>
+      </div>
+      <div class="toolbar">
+        <select id="sourceFilter"><option value="">All sellers</option></select>
+        <select id="typeFilter">
+          <option value="">All sources</option>
+          <option value="store">Your stores</option>
+          <option value="web">Google web results</option>
+          <option value="shopping">Google Shopping</option>
+        </select>
+        <label class="check"><input id="buyableOnly" type="checkbox" /> Buyable only</label>
+        <label class="check" title="Only sellers in your trusted list (Settings)"><input id="trustedOnly" type="checkbox" /> Trusted only</label>
+      </div>
+      <div id="status" class="status">Search for a part to list where it is available to buy.</div>
+      <div id="notes" class="notes" hidden></div>
+      <ul id="results" class="results"></ul>
+      <button id="moreBtn" class="more" hidden>Load more</button>
+      </div>
+      <div id="cartView" class="view" hidden>
+        <div class="toolbar cart-bar">
+          <div id="cartSummary" class="cart-summary"></div>
+          <button id="cartCheckBtn" title="Check every item now">⟳ Check now</button>
+          <button id="cartCsvBtn" title="Export cart as CSV">⭳ CSV</button>
+        </div>
+        <div id="cartStatus" class="status"></div>
+        <ul id="cartList" class="results"></ul>
+      </div>
+    </section>
+
+    <div id="splitter" class="splitter"></div>
+
+    <!-- Embedded browser -->
+    <section class="browser-pane">
+      <div class="navbar">
+        <button id="backBtn" title="Back">←</button>
+        <button id="fwdBtn" title="Forward">→</button>
+        <button id="reloadBtn" title="Reload">⟳</button>
+        <input id="urlBar" type="text" spellcheck="false" />
+        <button id="extractBtn" class="primary" title="Pull product listings from the page shown here">Extract listings</button>
+        <button id="addStoreBtn" title="Add this site to your stores — it will be searched with every search">＋ Add to stores</button>
+        <button id="cartPageBtn" title="Add the product on this page to your cart — price and stock are then tracked hourly">🛒 Add to cart</button>
+        <button id="externalBtn" title="Open in system browser">↗</button>
+      </div>
+      <div class="progress"><div id="progressBar"></div></div>
+      <div id="captchaBanner" class="captcha-banner" hidden>
+        <span>🧩 Google wants a CAPTCHA before it shows results. Solve it below — the search continues by itself.</span>
+        <button id="captchaSkipBtn" title="Carry on without Google (DuckDuckGo is used for blocked stores)">Skip</button>
+      </div>
+      <webview id="view" src="about:blank" partition="persist:finder" allowpopups></webview>
+    </section>
+  </main>
+
+  <dialog id="settingsDlg">
+    <form method="dialog" id="settingsForm">
+      <h2>Settings</h2>
+      <label>Search source
+        <select name="provider">
+          <option value="browser">Built-in browser – no key</option>
+          <option value="serpapi">SerpAPI (most reliable)</option>
+        </select>
+      </label>
+      <p class="hint" data-for="browser">Runs Google (all results + Shopping) in hidden browser windows. If Google asks for a CAPTCHA, it opens in the right pane: complete it, then search again.</p>
+      <label data-for="serpapi">SerpAPI key <input name="serpapiKey" type="password" autocomplete="off" /></label>
+      <p class="hint" data-for="serpapi">Get a key at serpapi.com. Uses Google web results and Google Shopping.</p>
+      <label class="check"><input name="inrOnly" type="checkbox" /> INR only — only listings priced in ₹ (searches Google as India)</label>
+      <label class="check"><input name="useStores" type="checkbox" /> Search my stores directly</label>
+      <label>My stores — one per line: <code>Name | site address</code> (the app uses the site's search box) or <code>Name | search URL with {q}</code>
+        <textarea name="stores" rows="8" spellcheck="false"></textarea></label>
+      <label>Trusted sellers — one per line: a domain (<code>robu.in</code>) or a seller name (<code>DigiKey</code>). Also: ☆ on any result.
+        <textarea name="trustedSites" rows="6" spellcheck="false"></textarea></label>
+      <label>Country (gl, when INR only is off) <input name="country" maxlength="2" /></label>
+      <label>Extra words for the web search <input name="webSuffix" placeholder="e.g. buy" /></label>
+      <p class="hint">Added to the Google “All” search so shop pages rank above datasheets. Leave empty for the plain part number.</p>
+      <label data-for="browser">Google result pages per search <input name="webPages" type="number" min="1" max="10" /></label>
+      <label class="check"><input name="siteSearchFallback" type="checkbox" /> When a store blocks the app’s search, find its products via DuckDuckGo / Google (site: search)</label>
+      <label>Result pages to read per store <input name="storePages" type="number" min="1" max="10" /></label>
+      <label>Check cart items every (minutes) <input name="trackEveryMinutes" type="number" min="5" max="1440" /></label>
+      <label class="check"><input name="keepInTray" type="checkbox" /> Keep running in the tray when the window is closed</label>
+      <label class="check"><input name="startAtLogin" type="checkbox" /> Start at login (in the tray) so the cart is always tracked</label>
+      <label>Listing pages to open for price / stock <input name="maxChecks" type="number" min="0" max="100" /></label>
+      <label class="check"><input name="includeShopping" type="checkbox" /> Also include Google Shopping results</label>
+      <menu>
+        <button value="cancel" formnovalidate>Cancel</button>
+        <button value="save" class="primary">Save</button>
+      </menu>
+    </form>
+  </dialog>
+
+
+  <script src="trust.js"></script>
+  <script src="extractor.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+{
+  "name": "components-finder",
+  "productName": "Components Finder",
+  "version": "0.1.0",
+  "description": "Desktop app that finds electronic components you can buy in India — searches your favourite stores, Google and Google Shopping at once, compares prices in ₹, and tracks price & stock in a cart.",
+  "keywords": [
+    "electronics",
+    "components",
+    "price-comparison",
+    "india",
+    "electron",
+    "robu",
+    "digikey",
+    "appimage"
+  ],
+  "homepage": "https://github.com/stimexpabs/components-finder#readme",
+  "bugs": {
+    "url": "https://github.com/stimexpabs/components-finder/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stimexpabs/components-finder.git"
+  },
+  "license": "MIT",
+  "author": "Pabitra Majhi (https://github.com/stimexpabs)",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/",
+    "dist": "electron-builder --linux AppImage"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "in.componentsfinder.app",
+    "productName": "Components Finder",
+    "artifactName": "ComponentsFinder-${version}-${arch}.${ext}",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "electronDist": "node_modules/electron/dist",
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility",
+      "icon": "assets/icon.png",
+      "synopsis": "Find electronic components to buy in India, compare prices and track them",
+      "executableName": "components-finder"
+    }
+  }
+}
