@@ -277,6 +277,17 @@ function extractProductInfo() {
       text.match(/(?:in stock|stock|available|quantity available)\s*[:\-]?\s*(\d{1,3}(?:,\d{3})+|\d+)/i);
     if (m) out.stockQty = toNum(m[1]);
   }
+  // What the page visibly tells shoppers ("Availability: Out of Stock") wins over structured
+  // data: that's written for search engines and can be stale — Robu's said InStock while its
+  // page showed "Availability: Out of Stock", which gave a false back-in-stock alert.
+  const label = text.match(/\b(?:availability|stock status|stock)\s*[:\-]\s*([A-Za-z][A-Za-z ]{1,30})/i);
+  if (label) {
+    const v = label[1];
+    const visible = /out of stock|sold out|unavailable|not available|discontinued/i.test(v) ? 'OutOfStock'
+      : /back ?order/i.test(v) ? 'BackOrder' : /pre-?order/i.test(v) ? 'PreOrder'
+        : /in stock|available|ready to ship/i.test(v) ? 'InStock' : null;
+    if (visible) out.availability = visible;
+  }
   if (!out.availability) {
     if (/out of stock|sold out|currently unavailable|no longer available|discontinued|obsolete/i.test(text)) out.availability = 'OutOfStock';
     else if (out.stockQty || /in stock|ships today|add to cart|add to basket|buy now/i.test(text)) out.availability = 'InStock';

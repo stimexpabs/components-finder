@@ -1,7 +1,7 @@
 {
   "name": "components-finder",
   "productName": "Components Finder",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Desktop app that finds electronic components you can buy in India — searches your favourite stores, Google and Google Shopping at once, compares prices in ₹, and tracks price & stock in a cart.",
   "keywords": [
     "electronics",
